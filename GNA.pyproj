@@ -25,6 +25,9 @@
     <Compile Include="GNA\middlewares.py" />
     <Compile Include="GNA\pipelines.py" />
     <Compile Include="GNA\settings.py" />
+    <Compile Include="GNA\FileUrlParse.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GNA\spiders\GNASpider.py">
       <SubType>Code</SubType>
     </Compile>
