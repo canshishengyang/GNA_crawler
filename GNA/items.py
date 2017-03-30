@@ -16,8 +16,14 @@ class PjItem(scrapy.Item):
     pj_name = scrapy.Field()
     pj_desc = scrapy.Field()
     pj_date = scrapy.Field()
-    pj_members = scrapy.Field()
+    pj_license = scrapy.Field()
+    pj_status = scrapy.Field()
+   # pj_members = scrapy.Field()
 class FileItem(scrapy.Item):
     pj_name = scrapy.Field()
     file_urls = scrapy.Field()
+    svn_url = scrapy.Field()
+class MemberItem(scrapy.Item):
+    pj_name = scrapy.Field()
+    member_list = scrapy.Field()
     

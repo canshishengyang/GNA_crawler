@@ -1,11 +1,11 @@
-import re
+
 import urllib2
 
 import codecs # languange encode and decode
 from lxml import etree #the python built in xpath module  
 
+import tarfile
 
-import pprint
 import svn #the two packages for svn
 def svn_pageurl(pj_name):
        # url = ""
@@ -17,9 +17,11 @@ def svn_pageurl(pj_name):
         url = urlparse.urlunparse((scheme,netloc,path,params,query))
         return url
 
-def svn_fetch(svn_url):
-    pass    
-def dfs_get_file(file_url,fileitem):
+def svn_fetch(svn_url,path):
+    r = svn.remote.RemoteClient(path)
+    r.checkout(path)
+        
+def dfs_get_file_url(file_url,fileitem):
         
     req = urllib2.Request(file_url)
     resultlist = []
@@ -36,6 +38,7 @@ def dfs_get_file(file_url,fileitem):
     for result in result_list:
         if not str(result).endswith(r"/"):
            if r"." in str(result):
-              fileitem['sad'].append(url+result)
+             fileitem['file_urls'].append(url+result)
+            # print url+result
         else:
-           dfs_get_file(url+result,fileitem)
+           dfs_get_file_url(url+result,fileitem)

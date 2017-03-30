@@ -21,17 +21,24 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GNA\DAO.py" />
+    <Compile Include="GNA\db_operation.py" />
     <Compile Include="GNA\items.py" />
     <Compile Include="GNA\middlewares.py" />
+    <Compile Include="GNA\Panic.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GNA\pipelines.py" />
     <Compile Include="GNA\settings.py" />
     <Compile Include="GNA\FileUrlParse.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GNA\signCalc.py" />
     <Compile Include="GNA\spiders\GNASpider.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GNA\spiders\__init__.py" />
+    <Compile Include="GNA\udload2.py" />
     <Compile Include="GNA\__init__.py" />
   </ItemGroup>
   <ItemGroup>
