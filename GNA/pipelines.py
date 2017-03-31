@@ -11,48 +11,95 @@ from GNA.DAO import insert_into_pj
 from GNA.DAO import insert_into_files
 from GNA.DAO import if_project_exists
 from GNA.DAO import selectMD5
-from GNA.DAO import delete_project
-from GNA.DAO import if
+from GNA.DAO import update_project_record
+from GNA.DAO import if_member_exists
+from GNA.DAO import select_id_by_pjname
+from GNA.DAO import connect_db
+from GNA.DAO import if_file_exists
+from GNA.DAO import insert_into_members
+from GNA.DAO import update_members_record
+
 
 from GNA.Panic import panic
+
 
 from GNA.items import FileItem
 from GNA.items import PjItem
 from GNA.items import MemberItem
 
+
+from GNA.udload2 import upload_to_commonstorage
+
+from GNA.FileUrlParse import zip_path
 from GNA.FileUrlParse import svn_fetch
 
 from GNA.signCalc import calcmd5
 
+from GNA.FileUrlParse import svn_fetch
+
 import MySQLdb
 import scrapy
+import datetime
 
+class Printpipeline(object):
+     def process_item(self,item,spider):
+        if isinstance(item,FileItem):
+            print 'FileItem'
+        return item
 class GnaPipeline(object):
     def process_item(self, item, spider):
         if isinstance(item,MemberItem):
-             
-             pass
-        elif isinstance(item,PjItem):
-            result = if_project_exists('',item['pj_name'])
-           
-            md5 = calcmd5(item['pj_name'],item['pj_desc'],item['pj_status'],item['pj'])
-            #如果该pj_name不存在,就直接进行插入
+             #result = if_member_exists('',item[''])
+            md5 = calcmd5(item['member_content'])
+            result = selectMD5('GNA_memberlists',md5)
+            pj_id = select_id_by_pjname('GNA_projects',item['pj_name'])
             if not result:
-                insert_into_pj('',item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'])
-                
+                insert_into_members('GNA_memberlists',item['member_content'],pj_id[0][0],md5)
+            else:
+                if str(md5)==result[0][0]:
+                   update_members_record('GNA_memberlists',result[0][0],md5)
+                else:
+                   raise DropItem('members_exists!!')            
+       
+        elif isinstance(item,PjItem):
+            result = if_project_exists('GNA_projects',item['pj_name'])
+           
+            md5 = calcmd5(item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'])
+            #如果该pj_name不存在,就直接进行插入
+            
+            if not result:
+                insert_into_pj('GNA_projects',item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'],str(md5))
+             
             else:
             #如果pj_name存在，则进行MD5验证    
-                md5now = selectMD5('Codeplex_projects',md5)
+                md5now = selectMD5('GNA_projects',md5)
                 
                 if not md5now:
                     #如果md5结果不存在，进行内容更新
-                    #delete_project('',item['pj_name'])
-                    #insert_into_pj('',item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'])
-                    pass
+                    result = select_id_by_pjname('GNA_projects',item['pj_name'])
+                    update_project_record('GNA_projects',int(result[0][0]),item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'],md5)
                 else: 
                     
                     raise DropItem("Project exists!!")    
-
+        elif isinstance(item,FileItem):
+            #把svn获取的结果用tuple传递回来。
+            tp = item['tp_svn']
+            
+            svn_url = tp[0]
+            svn_name = tp[1]
+            svn_path = r"./code/"+svn_name
+            try:
+                svn_fetch(svn_url,svn_path)
+                date = datetime.datetime.now().strftime('%Y-%m-%d')
+                final_path = zip_path(svn_path,'./code/','svn_'+date+'_'+svn_name+'.zip')
+            
+                upload_to_commonstorage(str(final_path).split('/')[-1])
+                result = select_id_by_pjname('GNA_projects',svn_name)
+                insert_into_files('GNA_files',final_path,str(result[0][0]))
+            except Exception,e:
+                print e
+            
+            
         return item
 
 class DownloadPipeline(FilesPipeline):
@@ -61,26 +108,32 @@ class DownloadPipeline(FilesPipeline):
             for url in item['file_urls']:
                 scrapy.Request(url)
             
-
+        #return item
         return super(DownloadPipeline, self).get_media_requests(item, info)
 
 
     def item_completed(self, results, item, info):
         db=connect_db()
-        if isinstance(item,CommitItem):
+        
+        if isinstance(item,FileItem):
+           #对于下载完成之后的每一个结果
             for tp in results:
+               print 'finish item  of tp'+ str(tp[0])
                if tp[0]==True:
-                    id = select_id_by_pjname(item['pj_name'])
+                    id = select_id_by_pjname('GNA_projects',item['pj_name'])
+                    #首先看下载是否成功，如果成功则先看对应的工程是否存在
                     if not id:
+                        
                         panic(r"the project name does't exists !!!") # en taro Linus
                     else:
-                       
-                        if not if_file_exists('GNA_files',id[0][0],item['commit_id']):
+                        #如果工程存在，再看文件本身是否存在
+                        if not if_file_exists('GNA_files',str(tp[1]['path']).split('/')[-1]):
                             
                            
                             upload_to_commonstorage('./codes/full/'+str(tp[1]['path']).split('/')[-1])
-                            insert_into_files(scheme,str(tp[1]['path']).split('/')[-1],str(id[0][0]))
-                        
+                            insert_into_files('GNA_files',str(tp[1]['path']).split('/')[-1],str(id[0][0]))
+                        else:
+                            raise DropItem('file exsits!!')
         else:
             pass
         return item

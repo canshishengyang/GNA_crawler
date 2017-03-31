@@ -22,8 +22,8 @@ class PjItem(scrapy.Item):
 class FileItem(scrapy.Item):
     pj_name = scrapy.Field()
     file_urls = scrapy.Field()
-    svn_url = scrapy.Field()
+    tp_svn = scrapy.Field()
 class MemberItem(scrapy.Item):
     pj_name = scrapy.Field()
-    member_list = scrapy.Field()
+    member_content = scrapy.Field()
     

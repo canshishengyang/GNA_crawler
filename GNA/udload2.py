@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 import urllib2

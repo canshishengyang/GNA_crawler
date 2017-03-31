@@ -37,13 +37,13 @@ COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
-FILES_STORE = '.\\codes'
+FILES_STORE = './codes'
 # Override the default request headers:
 #DEFAULT_REQUEST_HEADERS = {
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
 #}
-
+DOWNLOAD_TIMEOUT = 1800
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
@@ -65,6 +65,7 @@ FILES_STORE = '.\\codes'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
+   # 'GNA.pipelines.Printpipeline':200,
     'GNA.pipelines.GnaPipeline': 300,
     'GNA.pipelines.DownloadPipeline':400,
 }

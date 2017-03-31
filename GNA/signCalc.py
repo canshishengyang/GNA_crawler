@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import hashlib
 
 def calcmd5(*kwargs):

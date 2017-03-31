@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{d94b0133-8362-4855-ab1e-242fd4501e8b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile />
+    <StartupFile>GNA\DAO.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
