@@ -19,7 +19,7 @@ def dfs_get_zip_file(input_path,result):
    
 def zip_path(input_path,output_path,output_name):
     #本方法目前有一个缺陷，就是不能包含子目录
-    
+    #ps:已经改好了
     f = zipfile.ZipFile(output_path+'/'+output_name,'w',zipfile.ZIP_DEFLATED)
     filelists = []
     dfs_get_zip_file(input_path,filelists)

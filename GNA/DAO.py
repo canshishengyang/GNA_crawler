@@ -7,6 +7,7 @@ from db_operation import insert_into_db
 from db_operation import select_field_from_table
 from db_operation import delete_from_table
 
+import time
 
 
 
@@ -26,27 +27,27 @@ def connect_db():
 def insert_into_files(scheme,file_url,pj_id):
     db = connect_db()
     insert_into_db(db,scheme,
-                   "id,file_url,pj_id",
-                         "0,'"+file_url+"','"+pj_id+"'")
+                   "id,file_url,pj_id,update_time",
+                         "0,'"+file_url+"','"+pj_id+"','"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"'")
 def insert_into_pj(scheme,pj_name,pj_desc,pj_status,pj_date,pj_license,md5):
     db =connect_db()
     str(pj_desc).replace(r"'",r"")
-    insert_into_db(db,scheme,"id,pj_name,pj_desc,pj_status,pj_date,pj_license,md5",r"0,'"+
+    insert_into_db(db,scheme,"id,pj_name,pj_desc,pj_status,pj_date,pj_license,md5,update_time",r"0,'"+
                                                                                 pj_name+"','"+
                                                                                     pj_desc+r"','"+
                                                                                         pj_status+r"','"+
                                                                                             pj_date+r"','"+
-                                                                                                pj_license+r"','"+md5+r"'")
+                                                                                                pj_license+r"','"+md5+r"','"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"'")
                                                                                     
 
 def insert_into_members(scheme,member_list,pj_id,md5):
     db = connect_db()
-    insert_into_db(db,scheme,"id,members,pj_id,md5",r"0,'"+member_list+r"','"+str(pj_id)+"','"+md5+"'")
+    insert_into_db(db,scheme,"id,members,pj_id,md5,update_time",r"0,'"+member_list+r"','"+str(pj_id)+"','"+md5+"','"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"'")
     #member_list这个字段中，每一个人名字都是用‘;’进行分割
 
 def update_project_record(scheme,id,pj_name,pj_desc,pj_status,pj_date,pj_licensen,md5):
     db= connect_db()
-    sql = r"update "+scheme+r" set pj_name= '"+pj_name+r"',pj_desc = '"+pj_desc+r"',pj_status = '"+pj_status+r"',pj_date = '"+pj_date+r"',pj_license= '"+pj_licensen+r"',md5 = '"+md5+"' where id ="+str(id) + r";"
+    sql = r"update "+scheme+r" set pj_name= '"+pj_name+r"',pj_desc = '"+pj_desc+r"',pj_status = '"+pj_status+r"',pj_date = '"+pj_date+r"',pj_license= '"+pj_licensen+r"',md5 = '"+md5+"',update_time='"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' where id ="+str(id) + r";"
     print sql
     try:
         cursor = db.cursor()
@@ -59,7 +60,7 @@ def update_project_record(scheme,id,pj_name,pj_desc,pj_status,pj_date,pj_license
         
 def update_members_record(scheme,id,members,md5):
     db= connect_db()
-    sql = r"update "+scheme+r" set members= '"+members+"',md5 = '"+md5+"' where id ="+str(id) + r";"
+    sql = r"update "+scheme+r" set members= '"+members+"',md5 = '"+md5+"',update_time='"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' where id ="+str(id) + r";"
     print sql
     try:
         cursor = db.cursor()

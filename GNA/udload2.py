@@ -118,7 +118,7 @@ def del_from_commonstorage(uri):
 if __name__=='__main__':
   #  download_from_commonstorage()
     #uri=upload_to_commonstorage('e683069cd39420c3dd446ea4916194b60a579503.zip' )
-    uri =    download_from_commonstorage('e683069cd39420c3dd446ea4916194b60a579503.zip','download.txt')
+    uri =    download_from_commonstorage('svn_2017-05-05_agt.zip','download.txt')
     print(uri)
 
 #download_from_cloud('a6e2db353c2eca0bbbed174ea0fd9d73','.txt')

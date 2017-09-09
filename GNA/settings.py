@@ -43,8 +43,7 @@ FILES_STORE = './codes'
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
 #}
-DOWNLOAD_TIMEOUT = 1800
-# Enable or disable spider middlewares
+DOWNLOAD_TIMEOUT = 1000# Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
 #    'GNA.middlewares.GnaSpiderMiddleware': 543,

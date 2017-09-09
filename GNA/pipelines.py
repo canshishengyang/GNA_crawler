@@ -40,6 +40,7 @@ from GNA.FileUrlParse import svn_fetch
 import MySQLdb
 import scrapy
 import datetime
+import os
 
 class Printpipeline(object):
      def process_item(self,item,spider):
@@ -68,7 +69,7 @@ class GnaPipeline(object):
             #如果该pj_name不存在,就直接进行插入
             
             if not result:
-                insert_into_pj('GNA_projects',item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'],str(md5))
+                insert_into_pj('GNA_projects',str(item['pj_name']).replace("'",""),str(item['pj_desc']).replace("'",""),item['pj_status'],item['pj_date'],item['pj_license'],str(md5))
              
             else:
             #如果pj_name存在，则进行MD5验证    
@@ -77,7 +78,7 @@ class GnaPipeline(object):
                 if not md5now:
                     #如果md5结果不存在，进行内容更新
                     result = select_id_by_pjname('GNA_projects',item['pj_name'])
-                    update_project_record('GNA_projects',int(result[0][0]),item['pj_name'],item['pj_desc'],item['pj_status'],item['pj_date'],item['pj_license'],md5)
+                    update_project_record('GNA_projects',int(result[0][0]),str(item['pj_name']).replace("'",""),str(item['pj_desc']).replace("'",""),item['pj_status'],item['pj_date'],item['pj_license'],md5)
                 else: 
                     
                     raise DropItem("Project exists!!")    
@@ -93,9 +94,13 @@ class GnaPipeline(object):
                 date = datetime.datetime.now().strftime('%Y-%m-%d')
                 final_path = zip_path(svn_path,'./code/','svn_'+date+'_'+svn_name+'.zip')
             
-                upload_to_commonstorage(str(final_path).split('/')[-1])
-                result = select_id_by_pjname('GNA_projects',svn_name)
-                insert_into_files('GNA_files',final_path,str(result[0][0]))
+                re = upload_to_commonstorage(final_path)
+                if re== True:
+                    result = select_id_by_pjname('GNA_projects',svn_name)
+                    insert_into_files('GNA_files',str(final_path).split('/')[-1],str(result[0][0]))
+                    os.remove(final_path)
+                else:
+                    os.remove(final_path)
             except Exception,e:
                 print e
             
@@ -130,8 +135,13 @@ class DownloadPipeline(FilesPipeline):
                         if not if_file_exists('GNA_files',str(tp[1]['path']).split('/')[-1]):
                             
                            
-                            upload_to_commonstorage('./codes/full/'+str(tp[1]['path']).split('/')[-1])
-                            insert_into_files('GNA_files',str(tp[1]['path']).split('/')[-1],str(id[0][0]))
+                            re = upload_to_commonstorage('./codes/full/'+str(tp[1]['path']).split('/')[-1])
+                            if re==True:
+    
+                                insert_into_files('GNA_files',str(tp[1]['path']).split('/')[-1],str(id[0][0]))
+                                os.remove('./codes/full/'+str(tp[1]['path']).split('/')[-1])
+                            else:
+                                os.remove('./codes/full/'+str(tp[1]['path']).split('/')[-1])
                         else:
                             raise DropItem('file exsits!!')
         else:

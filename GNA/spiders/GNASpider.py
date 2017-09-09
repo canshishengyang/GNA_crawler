@@ -24,7 +24,7 @@ class GNASpider(scrapy.spider.Spider):
         netloc='gna.org'
         path='/search/'
         params=''
-        offset = 1300
+        offset = 0
         query='type_of_search=soft&words=%2A&type=1&max_rows=25&offset='+str(offset)
        #说明一下关键字段 max_row：该页面一共显示多少个项目
                         #offset：当前的偏移量，也就是从第几个项目开始。目前GNA！的服务器上共有一千四百来个项目
